@@ -1,0 +1,74 @@
+/*
+ * main.c
+ *
+ *  Created on: 3 lip 2018
+ *      Author: Symulator 3D
+ */
+#include <stdlib.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/pgmspace.h>
+#include <util/delay.h>
+#include <math.h>  //include libm
+
+#include "mpu6050/mpu6050.h"
+
+#define UART_BAUD_RATE 57600
+#include "uart/uart.h"
+
+int main(void) {
+
+
+
+	#if MPU6050_GETATTITUDE == 1 || MPU6050_GETATTITUDE == 2
+
+    double qw = 1.0f;
+	double qx = 0.0f;
+	double qy = 0.0f;
+	double qz = 0.0f;
+	double roll = 0.0f;
+	double pitch = 0.0f;
+	double yaw = 0.0f;
+	#endif
+
+    //init uart
+	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE,F_CPU));
+
+	//init interrupt
+	sei();
+
+	//init mpu6050
+	mpu6050_init();
+	_delay_ms(50);
+
+
+
+	for(;;) {
+
+
+
+
+		// IMU - 6050 Inicjalizacja
+		#if MPU6050_GETATTITUDE == 1
+		mpu6050_getQuaternion(&qw, &qx, &qy, &qz);
+		mpu6050_getRollPitchYaw(&roll, &pitch, &yaw);
+		_delay_ms(10);
+		#endif
+
+		// IMU - 6050 - Komuniakcja
+		#if MPU6050_GETATTITUDE == 1 || MPU6050_GETATTITUDE == 2
+		char itmp[10];
+		dtostrf(roll, 3, 3, itmp); uart_puts(itmp); uart_putc(' ');
+		dtostrf(pitch, 3, 3, itmp); uart_puts(itmp); uart_putc(' ');
+		dtostrf(yaw, 3, 3, itmp); uart_puts(itmp); uart_putc(' ');
+		uart_puts("\r\n");
+
+
+		#endif
+
+
+	}
+
+}
+
+

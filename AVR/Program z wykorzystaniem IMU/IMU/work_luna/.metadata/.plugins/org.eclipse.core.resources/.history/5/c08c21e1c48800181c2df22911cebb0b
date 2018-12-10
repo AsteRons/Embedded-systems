@@ -1,0 +1,199 @@
+/*
+ * main.c
+ *
+ *  Created on: 3 lip 2018
+ *      Author: Symulator 3D
+ */
+#include <stdlib.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/pgmspace.h>
+#include <util/delay.h>
+#include <math.h>  //include libm
+
+#include "mpu6050/mpu6050.h"
+
+#define UART_BAUD_RATE 57600
+#include "uart/uart.h"
+
+
+// Przycisk TEST definicja
+#define TEST_PIN (1<<PC3)
+#define TEST_DOWN !(PINC & TEST_PIN)
+
+
+	// Przycisk pozycyjny(blokada)
+
+	// Pozycja 1
+#define BLOKADA_PIN_1 (1<<PC2)
+#define BLOKADA_DOWN_1 !(PINC & BLOKADA_PIN_1)
+
+
+	//Pozycja 2
+
+#define BLOKADA_PIN_2 (1<<PC1)
+#define BLOKADA_DOWN_2 !(PINC & BLOKADA_PIN_2)
+
+// SPUST
+
+#define SPUST_PIN (1<<PC0)
+#define SPUST_DOWN !(PINC & SPUST_PIN)
+
+
+int main(void) {
+
+	//Spust
+	DDRC &= ~SPUST_PIN ;
+	PORTC |= SPUST_PIN ;
+    int temp_Spust = 0;
+
+	//  Przycisk_TEST
+	DDRC &= ~TEST_PIN;
+	PORTC |= TEST_PIN;
+    int temp_TEST = 0;
+
+	// Przycisk pozycyjny(blokada)
+	// Pozycja 1
+	DDRC &= ~BLOKADA_PIN_1;
+	PORTC |= BLOKADA_PIN_1;
+    int temp_BLOKADA_1 = 0;
+
+
+	// Pozycja 2
+	DDRC &= ~BLOKADA_PIN_2;
+	PORTC |= BLOKADA_PIN_2;
+    int temp_BLOKADA_2 = 0;
+
+
+
+	//  deklaracja zmiennych IMU -6050
+	#if MPU6050_GETATTITUDE == 1 || MPU6050_GETATTITUDE == 2
+
+    double qw = 1.0f;
+	double qx = 0.0f;
+	double qy = 0.0f;
+	double qz = 0.0f;
+	double roll = 0.0f;
+	double pitch = 0.0f;
+	double yaw = 0.0f;
+
+	#endif
+
+
+    //init uart
+	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE,F_CPU));
+
+	//init interrupt
+	sei();
+
+	//init mpu6050
+	mpu6050_init();
+	_delay_ms(50);
+
+
+
+	for(;;) {
+
+
+	 // IMU - 6050 Inicjalizacja
+		#if MPU6050_GETATTITUDE == 1
+		mpu6050_getQuaternion(&qw, &qx, &qy, &qz);
+		mpu6050_getRollPitchYaw(&roll, &pitch, &yaw);
+		_delay_ms(10);
+		#endif
+
+
+
+		// IMU - 6050 - Komuniakcja
+		#if MPU6050_GETATTITUDE == 1 || MPU6050_GETATTITUDE == 2
+		char itmp[10];
+		uart_puts("IMU ");
+		dtostrf(roll, 3, 3, itmp); uart_puts(itmp); uart_putc(' ');
+		dtostrf(pitch, 3, 3, itmp); uart_puts(itmp); uart_putc(' ');
+		dtostrf(yaw, 3, 3, itmp); uart_puts(itmp); uart_putc(' ');
+		uart_puts("\r\n");
+		_delay_ms(100);
+		#endif
+
+
+			// Przycisk TEST Implementacja
+		if(TEST_DOWN != temp_TEST)
+		{
+			temp_TEST = TEST_DOWN;
+
+			if(	temp_TEST == 1)
+			{
+				uart_puts("P3 1\r\n");
+			}
+			if(temp_TEST == 0)
+			{
+				uart_puts("P3 0\r\n");
+			}
+				_delay_ms(50);
+
+		}
+
+
+
+		// Przycisk pozycyjny(blokada)
+		// Pozycja 1
+		if(BLOKADA_DOWN_1 != temp_BLOKADA_1)
+		{
+			temp_BLOKADA_1 = BLOKADA_DOWN_1;
+
+			if(	temp_BLOKADA_1 == 1)
+			{
+				uart_puts("P2 0\r\n");
+			}
+
+
+				_delay_ms(100);
+
+		}
+
+
+		// Pozycja 2
+		if(BLOKADA_DOWN_2 != temp_BLOKADA_2)
+		{
+			temp_BLOKADA_2 = BLOKADA_DOWN_2;
+
+			if(	temp_BLOKADA_2 == 1)
+			{
+				uart_puts("P2 1\r\n");
+			}
+
+				_delay_ms(100);
+			}
+
+
+
+
+		// Spust
+
+		if(SPUST_DOWN != temp_Spust)
+		{
+			temp_Spust = SPUST_DOWN;
+
+			if(	temp_Spust == 1)
+			{
+				uart_puts("P1 1\r\n");
+			}
+			if(temp_Spust == 0)
+			{
+				uart_puts("P1 0\r\n");
+			}
+				_delay_ms(100);
+
+			}
+
+
+
+		    }
+
+
+
+
+
+}
+
+

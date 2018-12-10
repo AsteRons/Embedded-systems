@@ -1,0 +1,37 @@
+15:02:06 **** Build of configuration Release for project tiny26_VA ****
+make all 
+'Building target: tiny26_VA.elf'
+'Invoking: AVR C Linker'
+avr-gcc -Wl,-Map,tiny26_VA.map -mmcu=attiny26 -o "tiny26_VA.elf"  ./LCD/lcd44780.o  ./main.o   
+'Finished building target: tiny26_VA.elf'
+' '
+'Invoking: AVR Create Extended Listing'
+avr-objdump -h -S tiny26_VA.elf  >"tiny26_VA.lss"
+'Finished building: tiny26_VA.lss'
+' '
+'Create Flash image (ihex format)'
+avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex tiny26_VA.elf  "tiny26_VA.hex"
+'Finished building: tiny26_VA.hex'
+' '
+'Create eeprom image (ihex format)'
+avr-objcopy -j .eeprom --no-change-warnings --change-section-lma .eeprom=0 -O ihex tiny26_VA.elf  "tiny26_VA.eep"
+'Finished building: tiny26_VA.eep'
+' '
+'Invoking: Print Size'
+avr-size --format=avr --mcu=attiny26 tiny26_VA.elf
+AVR Memory Usage
+----------------
+Device: attiny26
+
+Program:    2150 bytes (105.0% Full)
+(.text + .data + .bootloader)
+
+Data:         43 bytes (33.6% Full)
+(.data + .bss + .noinit)
+
+
+'Finished building: sizedummy'
+' '
+
+15:02:07 Build Finished (took 656ms)
+

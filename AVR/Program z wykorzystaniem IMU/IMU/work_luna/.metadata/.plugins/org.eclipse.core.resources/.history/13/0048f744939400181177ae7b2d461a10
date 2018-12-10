@@ -1,0 +1,374 @@
+/*
+ * main.c
+ *
+ *  Created on: 3 lip 2018
+ *      Author: Symulator 3D
+ */
+#include <stdlib.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/pgmspace.h>
+#include <util/delay.h>
+#include <math.h>  //include libm
+#include <avr/wdt.h>
+
+#include "mpu6050/mpu6050.h"
+
+#define UART_BAUD_RATE 57600
+#include "uart/uart.h"
+
+//Definicja diody RGB
+
+//Dioda_RGB_1
+//DEFINICJA Blue
+#define LED_B (1<<PD5)
+#define LED_ON_B PORTD &= ~LED_B
+#define LED_OFF_B PORTD |= LED_B
+
+
+//DEFINICJA GREEN
+#define LED_G (1<<PD6)
+#define LED_ON_G PORTD &= ~LED_G
+#define LED_OFF_G PORTD |= LED_G
+
+
+//DEFINICJA RED
+#define LED_R (1<<PD7)
+#define LED_ON_R PORTD &= ~LED_R
+#define LED_OFF_R PORTD |= LED_R
+
+
+// Dioda_RGB_2
+//Definicja Blue
+#define LED_B_2 (1<<PD3)
+#define LED_ON_B_2 PORTD &= ~LED_B_2
+#define LED_OFF_B_2 PORTD |= LED_B_2
+
+
+//DEFINICJA GREEN
+#define LED_G_2 (1<<PD4)
+#define LED_ON_G_2 PORTD &= ~LED_G_2
+#define LED_OFF_G_2 PORTD |= LED_G_2
+
+
+
+//DEFINICJA RED
+
+#define LED_R_2 (1<<PB0)
+#define LED_ON_R_2 PORTB &= ~LED_R_2
+#define LED_OFF_R_2 PORTB |= LED_R_2
+
+
+
+
+// Przycisk TEST definicja
+#define TEST_PIN (1<<PC3)
+#define TEST_DOWN !(PINC & TEST_PIN)
+
+
+	// Przycisk pozycyjny(blokada)
+
+	// Pozycja 1
+#define BLOKADA_PIN_1 (1<<PC2)
+#define BLOKADA_DOWN_1 !(PINC & BLOKADA_PIN_1)
+
+
+	//Pozycja 2
+
+#define BLOKADA_PIN_2 (1<<PC1)
+#define BLOKADA_DOWN_2 !(PINC & BLOKADA_PIN_2)
+
+	// SPUST
+
+#define SPUST_PIN (1<<PC0)
+#define SPUST_DOWN !(PINC & SPUST_PIN)
+
+int main(void) {
+	// dioda RGB 2
+	   DDRD |= LED_B_2;
+	   DDRD |= LED_G_2;
+	   DDRB |= LED_R_2;
+	   //dioda RGB 1
+	   DDRD |= LED_B;
+	   DDRD |= LED_G;
+	   DDRD |= LED_R;
+volatile uint8_t flaga;
+char c;
+
+	//Spust
+	DDRC &= ~SPUST_PIN ;
+	PORTC |= SPUST_PIN ;
+    int temp_Spust = 0;
+
+	//  Przycisk_TEST
+	DDRC &= ~TEST_PIN;
+	PORTC |= TEST_PIN;
+    int temp_TEST = 0;
+
+	// Przycisk pozycyjny(blokada)
+	// Pozycja 1
+	DDRC &= ~BLOKADA_PIN_1;
+	PORTC |= BLOKADA_PIN_1;
+    int temp_BLOKADA_1 = 0;
+
+
+	// Pozycja 2
+	DDRC &= ~BLOKADA_PIN_2;
+	PORTC |= BLOKADA_PIN_2;
+    int temp_BLOKADA_2 = 0;
+
+
+
+	//  deklaracja zmiennych IMU -6050
+	#if MPU6050_GETATTITUDE == 1 || MPU6050_GETATTITUDE == 2
+
+    double qw = 1.0f;
+	double qx = 0.0f;
+	double qy = 0.0f;
+	double qz = 0.0f;
+	double roll = 0.0f;
+	double pitch = 0.0f;
+	double yaw = 0.0f;
+
+	#endif
+
+
+    //init uart
+	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE,F_CPU));
+
+	//init interrupt
+	sei();
+
+	//init mpu6050
+	mpu6050_init();
+	_delay_ms(50);
+
+      // Ustawienia stan pocz¹tkowy na 0
+
+
+	//Dioda RGB_2
+      LED_OFF_B_2;
+      LED_OFF_G_2;
+      LED_OFF_R_2;
+	//DIODA RGB_1
+
+	   LED_OFF_B;
+	   LED_OFF_G;
+	   LED_OFF_R;
+	for(;;) {
+
+		//Pobieranie danych UART
+
+
+				// Dioda RGB_1
+
+		                           while( (c=uart_getc()) )
+		                        	   {
+		                        	   if(c == '4')
+		                        	   {
+		                        		   LED_OFF_R;
+		                        		   LED_OFF_B;
+		                        		   LED_OFF_G;
+		                        		 uart_putc(c);
+		                        	   }
+
+
+		                        	   if(c == '1')
+		                        	   {
+		                        		   LED_OFF_R;
+		                        		   LED_OFF_G;
+		                        		   LED_ON_B;
+
+		                        		 uart_putc(c);
+		                        	   }
+
+
+
+		                        	   if(c == '2')
+		                        	  {
+		                        	   LED_OFF_R;
+		                        	   LED_OFF_B;
+		                        	   LED_ON_G;
+
+
+		                        	  	uart_putc(c);
+		                        	  		  }
+
+		                        	   if(c == '3')
+		                        	  {
+		                        	   LED_OFF_G;
+		                        	   LED_OFF_B;
+		                        	   LED_ON_R;
+
+
+		                        	  	uart_putc(c);
+		                        	  		  }
+
+
+		                        	   if(c == '5')
+		                        	  {
+		                        	   LED_OFF_G_2;
+		                        	   LED_OFF_R_2;
+		                        	   LED_ON_B_2;
+
+
+		                        	  	uart_putc(c);
+		                        	  }
+		                        	   if(c == '6')
+		                        	  {
+		                        	   LED_OFF_R_2;
+		                        	   LED_OFF_B_2;
+		                        	   LED_ON_G_2;
+
+
+
+		                        	  	uart_putc(c);
+		                        	  		  }
+		                        	   if(c == '7')
+		                        	  {
+
+		                        	   LED_OFF_B_2;
+		                        	   LED_OFF_G_2;
+		                        	   LED_ON_R_2;
+		                        	  	uart_putc(c);
+		                        	  		  }
+
+
+		                        	   if(c == '8')
+		                        	  {
+
+		                                LED_OFF_B_2;
+		                                LED_OFF_G_2;
+		                                LED_OFF_R_2;
+		                        	  	uart_putc(c);
+		                        	  		  }
+
+		                        	   if(c == 'R')
+		                        	   	 {
+
+		                        	   		uart_putc(c);
+		                        	   		cli();              // wy³¹cz przerwania
+		                        	   		wdt_enable( 0 );  // ustaw watch-dog
+		                        	   		while(1);
+		                        	   		}
+
+		                        	   }
+
+
+
+
+
+
+
+
+
+	 // IMU - 6050 Inicjalizacja
+		#if MPU6050_GETATTITUDE == 1
+		mpu6050_getQuaternion(&qw, &qx, &qy, &qz);
+		mpu6050_getRollPitchYaw(&roll, &pitch, &yaw);
+		_delay_ms(10);
+		#endif
+
+
+
+		// IMU - 6050 - Komuniakcja
+		#if MPU6050_GETATTITUDE == 1 || MPU6050_GETATTITUDE == 2
+		char itmp[10];
+		uart_puts("IMU ");
+		dtostrf(roll, 3, 3, itmp); uart_puts(itmp); uart_putc(' ');
+		dtostrf(pitch, 3, 3, itmp); uart_puts(itmp); uart_putc(' ');
+		dtostrf(yaw, 3, 3, itmp); uart_puts(itmp); uart_putc(' ');
+		uart_puts("\r\n");
+		_delay_ms(100);
+		#endif
+
+
+		//Implementacja diody RGB
+
+
+
+
+
+			// Przycisk TEST Implementacja
+		if(TEST_DOWN != temp_TEST)
+		{
+			temp_TEST = TEST_DOWN;
+
+			if(	temp_TEST == 1)
+			{
+				uart_puts("GROM P3 1\r\n");
+			}
+			if(temp_TEST == 0)
+			{
+				uart_puts("GROM P3 0\r\n");
+			}
+				_delay_ms(50);
+
+		}
+
+
+
+		// Przycisk pozycyjny(blokada)
+		// Pozycja 1
+		if(BLOKADA_DOWN_1 != temp_BLOKADA_1)
+		{
+			temp_BLOKADA_1 = BLOKADA_DOWN_1;
+
+			if(	temp_BLOKADA_1 == 1)
+			{
+				uart_puts("GROM P2 0\r\n");
+			}
+
+
+				_delay_ms(100);
+
+		}
+
+
+		// Pozycja 2
+		if(BLOKADA_DOWN_2 != temp_BLOKADA_2)
+		{
+			temp_BLOKADA_2 = BLOKADA_DOWN_2;
+
+			if(	temp_BLOKADA_2 == 1)
+			{
+				uart_puts("GROM P2 1\r\n");
+			}
+
+				_delay_ms(100);
+			}
+
+
+
+
+		// Spust
+
+		if(SPUST_DOWN != temp_Spust)
+		{
+			temp_Spust = SPUST_DOWN;
+
+			if(	temp_Spust == 1)
+			{
+				uart_puts("GROM P1 1\r\n");
+			}
+			if(temp_Spust == 0)
+			{
+				uart_puts("GROM P1 0\r\n");
+			}
+				_delay_ms(100);
+
+			}
+
+
+
+
+
+		    }
+
+
+
+
+
+}
+
+

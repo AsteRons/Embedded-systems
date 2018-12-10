@@ -1,0 +1,17 @@
+12:41:52 **** Build of configuration Release for project LCD_I2C_PCF8574 ****
+make all 
+'Invoking: Print Size'
+avr-size --format=avr --mcu=atmega328p LCD_I2C_PCF8574.elf
+AVR Memory Usage
+----------------
+Device: atmega328p
+
+Program:    3654 bytes (11.2% Full)
+(.text + .data + .bootloader)
+
+Data:        190 bytes (9.3% Full)
+(.data + .bss + .noinit)
+
+
+'Finished building: sizedummy'
+' '

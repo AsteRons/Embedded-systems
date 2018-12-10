@@ -1,0 +1,20 @@
+09:36:54 **** Incremental Build of configuration Release for project 03_Multi_LED ****
+make all 
+'Invoking: Print Size'
+avr-size --format=avr --mcu=atmega32 03_Multi_LED.elf
+AVR Memory Usage
+----------------
+Device: atmega32
+
+Program:     628 bytes (1.9% Full)
+(.text + .data + .bootloader)
+
+Data:          6 bytes (0.3% Full)
+(.data + .bss + .noinit)
+
+
+'Finished building: sizedummy'
+' '
+
+09:36:54 Build Finished (took 244ms)
+

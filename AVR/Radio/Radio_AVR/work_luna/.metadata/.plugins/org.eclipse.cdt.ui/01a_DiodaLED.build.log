@@ -1,0 +1,20 @@
+09:35:53 **** Incremental Build of configuration Release for project 01a_DiodaLED ****
+make all 
+'Invoking: Print Size'
+avr-size --format=avr --mcu=atmega32 01_DiodaLED.elf
+AVR Memory Usage
+----------------
+Device: atmega32
+
+Program:     152 bytes (0.5% Full)
+(.text + .data + .bootloader)
+
+Data:          0 bytes (0.0% Full)
+(.data + .bss + .noinit)
+
+
+'Finished building: sizedummy'
+' '
+
+09:35:54 Build Finished (took 401ms)
+

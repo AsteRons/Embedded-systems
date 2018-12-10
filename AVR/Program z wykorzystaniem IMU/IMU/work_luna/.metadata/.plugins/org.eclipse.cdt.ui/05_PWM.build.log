@@ -1,0 +1,20 @@
+15:48:57 **** Build of configuration Release for project 05_PWM ****
+make all 
+Invoking: Print Size
+avr-size --format=avr --mcu=atmega32 05_PWM.elf
+AVR Memory Usage
+----------------
+Device: atmega32
+
+Program:     510 bytes (1.6% Full)
+(.text + .data + .bootloader)
+
+Data:          7 bytes (0.3% Full)
+(.data + .bss + .noinit)
+
+
+Finished building: sizedummy
+ 
+
+15:48:57 Build Finished (took 135ms)
+

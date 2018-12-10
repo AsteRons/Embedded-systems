@@ -1,0 +1,37 @@
+09:36:31 **** Incremental Build of configuration Release for project 02_MicroSwitch ****
+make all 
+'Building target: 02_MicroSwitch.elf'
+'Invoking: AVR C Linker'
+avr-gcc -Wl,-Map,02_MicroSwitch.map -mmcu=atmega32 -o "02_MicroSwitch.elf"  ./main.o   
+'Finished building target: 02_MicroSwitch.elf'
+' '
+'Invoking: AVR Create Extended Listing'
+avr-objdump -h -S 02_MicroSwitch.elf  >"02_MicroSwitch.lss"
+'Finished building: 02_MicroSwitch.lss'
+' '
+'Create Flash image (ihex format)'
+avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex 02_MicroSwitch.elf  "02_MicroSwitch.hex"
+'Finished building: 02_MicroSwitch.hex'
+' '
+'Create eeprom image (ihex format)'
+avr-objcopy -j .eeprom --no-change-warnings --change-section-lma .eeprom=0 -O ihex 02_MicroSwitch.elf  "02_MicroSwitch.eep"
+'Finished building: 02_MicroSwitch.eep'
+' '
+'Invoking: Print Size'
+avr-size --format=avr --mcu=atmega32 02_MicroSwitch.elf
+AVR Memory Usage
+----------------
+Device: atmega32
+
+Program:     194 bytes (0.6% Full)
+(.text + .data + .bootloader)
+
+Data:          0 bytes (0.0% Full)
+(.data + .bss + .noinit)
+
+
+'Finished building: sizedummy'
+' '
+
+09:36:32 Build Finished (took 639ms)
+

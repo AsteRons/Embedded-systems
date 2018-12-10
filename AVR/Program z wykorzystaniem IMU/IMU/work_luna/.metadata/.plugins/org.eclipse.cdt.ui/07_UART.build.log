@@ -1,0 +1,20 @@
+10:46:32 **** Incremental Build of configuration Release for project 07_UART ****
+make all 
+'Invoking: Print Size'
+avr-size --format=avr --mcu=atmega328p 07_UART_kalibracja.elf
+AVR Memory Usage
+----------------
+Device: atmega328p
+
+Program:   11766 bytes (35.9% Full)
+(.text + .data + .bootloader)
+
+Data:        159 bytes (7.8% Full)
+(.data + .bss + .noinit)
+
+
+'Finished building: sizedummy'
+' '
+
+10:46:32 Build Finished (took 243ms)
+
